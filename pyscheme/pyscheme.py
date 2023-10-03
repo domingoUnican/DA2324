@@ -18,10 +18,18 @@ fact = ('define', 'fact',
                             ('*', 'n', ('fact', ('-', 'n', 1))))))
 
 
+env = {'+': lambda x,y: x+y 
+
+    }
 
 # You will define the following procedure for evaluating an expression
 def seval(sexp):
-    ...
+    if isinstance(sexp,int):
+        return sexp
+    elif isinstance(sexp, tuple):
+        func = env[sexp[0]]
+        args = [seval(e) for e in sexp[1:]]
+        return func(*args)
 
 # In writing seval, you are ONLY allowed to use the rules of Scheme
 # evaluation that you currently know about.  So far, this includes the
