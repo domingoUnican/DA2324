@@ -17,23 +17,44 @@ fact = ('define', 'fact',
                             1,
                             ('*', 'n', ('fact', ('-', 'n', 1))))))
 
-def pon_en_env(x,y):
+def pon_en_env(x, y):
     global env
-    env[x] = y
+    env[x] = seval(y)
 
-env = {'+': lambda x,y: x+y , 'define': pon_en_env
+
+env = {'+': lambda x, y: x+y,
+       'define': pon_en_env,
     }
 
+def hacer_funcion(argumentos, cuerpo):
+    def funcion(*valores):
+        for nombre, valor in zip(argumentos, valores):
+            cuerpo = substitucion(cuerpo, nombre, valor)
+        return cuerpo
+    return funcion
 
+def substitucion(exp, nombre, valor):
+    if exp == nombre:
+        return valor
+    elif isinstance(exp, tuple):
+        return tuple(substitucion(e, nombre, valor) for e in exp)
+    else:
+        return exp
 
 # You will define the following procedure for evaluating an expression
 def seval(sexp):
-    if isinstance(sexp,int):
+    if isinstance(sexp, int):
         return sexp
     elif isinstance(sexp, str):
-        return env.get(sexp,sexp) 
+        return env.get(sexp, sexp) 
     elif isinstance(sexp, tuple):
-        func = env[sexp[0]]
+        if sexp[0] == 'if':
+            "completar"
+            return 
+        elif sexp[0] == 'lambda':
+            "completar"
+            return 
+        func = seval(sexp[0])
         args = [seval(e) for e in sexp[1:]]
         return func(*args)
 
