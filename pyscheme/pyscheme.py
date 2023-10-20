@@ -23,15 +23,14 @@ def pon_en_env(x, y):
 
 
 env = {'+': lambda x, y: x+y,
-       'define': pon_en_env,
     }
 
-def hacer_funcion(argumentos, cuerpo):
+def hacer_funcion(argumentos, cuerpo): # Equivalente de hacer una funcion
     def funcion(*valores):
         for nombre, valor in zip(argumentos, valores):
             cuerpo = substitucion(cuerpo, nombre, valor)
         return cuerpo
-    return funcion
+    return funcion # se devuelve un objeto funcion
 
 def substitucion(exp, nombre, valor):
     if exp == nombre:
@@ -53,7 +52,10 @@ def seval(sexp):
             return 
         elif sexp[0] == 'lambda':
             "completar"
-            return 
+            return
+        elif sexp[0] == 'define':
+            "completar"
+            return
         func = seval(sexp[0])
         args = [seval(e) for e in sexp[1:]]
         return func(*args)

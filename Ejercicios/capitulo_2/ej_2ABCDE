@@ -1,0 +1,66 @@
+#lang racket
+
+(define (rectangulo-domingo x y w h)
+  (cons (cons x y) (cons w h)))
+(define (heigh-domingo rect)
+  (cdr (cdr rect)))
+(define (width-domingo rect)
+  (car (cdr rect)))
+
+(define (rectangulo-companero x y x1 y1)
+  (cons (cons x y) (cons x1 y1)))
+
+(define (width-companero rect)
+  (- (car (car rect)) (car (cdr rect))))
+
+(define (heigh-companero rect)
+  (- (cdr (cdr rect)) (cdr (car rect))))
+
+(define (poner-etiqueta  a x)
+  (list a x))
+
+(define rect1 (poner-etiqueta 'rectangulo-domingo (rectangulo-domingo 1 2 3 4)))
+
+(define (heigh rect)
+  (cond ((eq? (car rect) 'rectangulo-domingo)
+        (heigh-domingo (car (cdr rect))))
+        ((eq? (car rect) 'rectangulo-companero)
+         (heigh-companero (car (cdr rect))))))
+(define (rectangulo-domingo-m x y anchura altura)
+  (define (get-anchura)
+    anchura)
+  (define (get-altura)
+    altura)
+  (define (get-area)
+    (* anchura altura))
+  (define (dispacht mensaje)
+    (cond ((eq? mensaje 'altura) get-altura)
+          ((eq? mensaje 'anchura) get-anchura)
+          ((eq? mensaje 'area) get-area)
+          ((eq? mensaje 'tipo) 'domingo-rectangulo)
+          )
+    )
+  dispacht)
+
+(define a 12)
+(set! a 13)
+
+(define (make-account n)
+  (define (retirar a)
+    (set! n (- n a))
+    n
+    )
+  (define (dispacht mensaje)
+    (cond ((eq? mensaje 'retirar) retirar)))
+  
+  dispacht
+  )
+
+
+(define (make-accumulator n)
+  (define (dispacth a)
+    (set! n (+ n a))
+    n
+    )
+  dispacth)
+
