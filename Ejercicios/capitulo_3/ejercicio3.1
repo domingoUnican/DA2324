@@ -1,0 +1,16 @@
+#lang racket
+
+(define (make-accumulator acumulado) 
+  (lambda (x) 
+    (set! acumulado (+ x acumulado)) 
+    acumulado))
+
+(define A (make-accumulator 5))
+
+
+(A 10)
+;15
+
+(A 10)
+;25
+
