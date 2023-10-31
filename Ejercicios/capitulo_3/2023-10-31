@@ -1,0 +1,19 @@
+#lang racket
+(define promesa (delay (+ 3 2))); promesa
+(force promesa) ; cumplir la promesa y en ingles "Thunks" (thinks/ chunks)
+(define promesa1 (lambda () (+ 3 2)))
+; Cuando definimos un «stream», va a ser siempre un cons donde el primer
+; elemento es el elemento a tratar y el cdr es una promesa
+(define (stream-car s) (car s))
+(define (stream-cdr s) (force (cdr s)))
+(define (gran-intervalo comienzo fin) ; esto va a crear un «stream» de enteros entre
+   ; comienzo y fin
+  (if (> comienzo fin)
+      null
+      (cons comienzo (delay (gran-intervalo (+ comienzo 1) fin)))))
+
+(define (stream-ref s posicion)
+  (if (= posicion 1)
+      (stream-first s)
+
+      (stream-ref (stream-rest s) (- posicion 1))))
