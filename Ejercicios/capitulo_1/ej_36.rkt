@@ -1,5 +1,13 @@
-#lang racket
+#lang scheme
+
+; Modified fixed-point
 (define tolerance 0.00001)
+
+(define (print-and-next-try try next)
+  (newline)
+  (display next)
+  (newline)
+  (try next))
 
 (define (fixed-point f first-guess)
   (define (close-enough? v1 v2)
@@ -9,14 +17,9 @@
     (let ((next (f guess)))
       (if (close-enough? guess next)
           next
-          (try next))))
+          (print-and-next-try try next))))
   (try first-guess))
 
 
-(define (f x)
-  (lambda (y) (+ y x)))
-
-
-(define (double f)
-  (lambda (n) (f (f n))))
-(define (inc x) (+ x 1))
+; Test
+(fixed-point (lambda (x) (/ (log 1000) (log x))) 2)
