@@ -1,0 +1,21 @@
+* Capitulo 1: Evaluación y Computación 
+** Primitivos
+** Operaciones sobre los elementos
+** Funciones
+** El modelo de substitución
+* Algoritmos
+** Repetición del modelo de substitución (recursión)
+** Complejidad
+*** Complejidad espacial
+*** Complejidad temporal
+* Abstracción
+** nombres
+** encapsulación
+** patrones y DRY
+** Transformación de código (Let)
+* Procedimientos Abstractos
+** generación de otros procedimientos
+** procedimientos como elementos
+* Estructuras de datos
+* Abstracción
+* Procesamientos de datos

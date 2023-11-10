@@ -1,0 +1,452 @@
+\documentclass{article}
+\pagestyle{empty}
+
+\usepackage{amsmath}
+\usepackage{mathspec}
+\usepackage{nicefrac}
+%fontspec
+\setmainfont%[SmallCapsFont={Linux Biolinum Capitals O}]%
+{TeX Gyre Pagella}
+\def\paragriego{Anaktoria}
+% \def\paragriego{GFS Complutum}
+\setmonofont{Terminus (TTF)}
+%           [BoldFont={TerminusTTF-Bold}]
+\setmathsfont(Digits,Latin,Greek){Neo Euler}
+\usepackage[a4paper, text={15.5cm, 25cm}]{geometry}
+\addtolength\parskip{3mm}
+
+\usepackage{amssymb}
+\usepackage{pagecolor}
+\usepackage{pbox}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage[lined,spanish]{algorithm2e}
+\setlength\parindent{0pt}
+
+\usepackage[hang,flushmargin]{footmisc}
+
+\newcommand\id{\mbox{indeg}}
+\newcommand\od{\mbox{outdeg}}
+
+\newcommand\N{\mathbb{N}}
+\newcommand\Z{\mathbb{Z}}
+\newcommand\Q{\mathbb{Q}}
+
+\newcommand\ret{↵\ } % ⏎, 〈RET〉
+
+\newcommand\tr{^{\mbox{\footnotesize t}}}   % transpuesta
+
+\definecolor{morado}{RGB}{85, 39, 107}
+\definecolor{naranja_muy}{RGB}{255, 156, 59} % (1, .612, .231)
+\definecolor{naranja_osc}{RGB}{255, 191, 128} % (1, .749, .501)
+\definecolor{naranja_claro}{RGB}{255, 229, 204} % (1, .898, .8)
+\definecolor{marca}{RGB}{242, 140, 113}
+
+\newcommand\inp[1]{\colorbox{gray!40}{#1}} % ¿Sobra espacio a la izquierda?
+\newcommand\mrc{\color{marca!90!black}}
+
+\usepackage{stmaryrd}       % flecha
+
+%% \usepackage{marginnote}
+%% \reversemarginpar
+
+\newcounter{pregunta}
+\newcommand\prop[1]%
+{\addtocounter{pregunta}{1}
+\noindent%\marginnote
+{\color{naranja_muy}\small\bf\thepregunta)}
+%{$\rightarrowtriangle$}\ %
+\parbox[t]{.95\linewidth}{\it #1}}
+
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}
+
+\usepackage{array}
+% alineada a la derecha, anchura fija
+\newcolumntype{R}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{C}{>{$}c<{$}}
+\newcolumntype{M}[1]
+{>{\centering\arraybackslash $}m{#1}<{$}}
+
+% Para las flechas en tablas...
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{arrows}
+
+\newcommand\aparte[1]{%
+\hfill%{\color{black!60}\vline}\quad
+\begin{minipage}[t]{.9\linewidth}%
+\color{black!80!blue}\small #1
+\end{minipage}}
+
+\def\adentro#1{\hspace{.05\linewidth}
+  \parbox{.8\linewidth}{\small #1}}
+
+\XeTeXdashbreakstate = 0
+
+\usepackage{xstring}
+\usepackage{ifthen}
+\usepackage{xifthen}
+
+\usepackage{tcolorbox}
+\newtcolorbox{resalte}[1][]%
+{coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=3mm, bottom=3mm, left=3mm, right=3mm,
+colframe=naranja_osc, boxrule=1pt,
+left skip=0pt, right skip=4cm, #1}
+%segmentation style={solid}}
+%segmentation engine=empty}
+%segmentation style={double=white}}
+
+\newtcolorbox{resalte_chico}[1][]%
+{arc=3pt, colback=naranja_claro,
+top=1mm, bottom=1mm, left=1mm, right=3mm,
+colframe=naranja_osc, boxrule=1pt,
+left skip=0pt, right skip=4cm, #1}
+
+\newtcbox{resaltelinea}[1][]%
+{tcbox raise base, nobeforeafter,
+coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=1mm, bottom=1mm, left=1mm, right=0pt,
+colframe=naranja_osc, boxrule=1pt,
+#1}
+
+\newtcbox{resalteajustado}[1][]%
+{tcbox raise base, nobeforeafter,
+coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=0mm, bottom=0mm, left=0pt, right=0pt,
+colframe=naranja_osc, boxrule=1pt,
+#1}
+
+\newcommand\respuestas{{\color{naranja_muy}\bf Respuestas}
+\vspace{5mm}}
+
+\newcommand\figs{./figs}
+\newcommand\cod{./scripts}
+\newcommand\grf{./grafos}
+
+\newcommand\espacio{␣}
+\newcommand\vacio{\mbox{\fontspec{FreeSerif}∅}}
+
+\pagecolor{morado!10} % 238, 233, 240 (.933, .914, .941)
+
+\def\truca
+{~\par}
+\def\trucavuelve
+{~\par\vspace{-\baselineskip}}
+
+\usepackage[spanish]{babel}
+\usepackage{colortbl}
+
+\newcommand\gr{\color{gray}}
+
+\usepackage{diagbox}
+\usepackage{scalerel}
+\usepackage{multirow}
+
+\usepackage{eso-pic}
+
+\def\msi{\color{naranja_muy}{\fontspec{FreeSerif}✓}}
+\def\mno{{\fontspec{FreeSerif}✗}}
+
+\def\pyt{{\color{naranja_muy}\texttt{>>>}}}
+\def\pyc{{\color{naranja_muy}\texttt{...}}}
+\def\sh{{\color{naranja_muy}\texttt{\$}}\hspace{-1em} }
+\def\shc{{\color{naranja_muy}\texttt{>}}}
+\def\sg{{\color{naranja_muy}\texttt{sage:}}}
+\def\sgc{{\color{naranja_muy}\texttt{....:}}}
+\def\bl#1{{\color{black!50!blue}\texttt{#1}}}
+\def\ro#1{{\color{red!80!black}\texttt{#1}}}
+
+\begin{document}
+\shorthandoff{>}\shorthandoff{<}
+\centerline{\large\bf Particiones}
+\vspace{5mm}
+
+La función $p(n)$ cuenta,
+%\footnote{\href{http://oeis.org/A000041}{\texttt{http://oeis.org/A000041}}}
+para un número natural $n$, de cuántas maneras puede
+escribirse como suma de enteros positivos, sin tener en
+cuenta el orden de los sumandos.
+
+Por ejemplo, hay $p(5) = 7$ particiones del número $5$:
+
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $5$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_01}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $4 + 1$}\\[3mm]
+
+\includegraphics[scale=.7]{\figs/fig_03_02}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $3 + 2$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_03}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $3 + 1 + 1$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_04}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $2 + 2 + 1$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_05}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $2 + 1 + 1 + 1$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_06}
+\end{center}
+\end{minipage}\hfill
+\begin{minipage}[t]{.13\linewidth}
+\begin{center}
+{\footnotesize $1 + 1 + 1 + 1 + 1$}\\[3mm]
+
+\includegraphics[scale=.65]{\figs/fig_03_07}
+\end{center}
+\end{minipage}
+
+\newcommand\mo{\cellcolor{morado!20}}
+\newcommand\ma{\cellcolor{morado!40}}  % (187, 169, 196)
+\newcommand\me{\cellcolor{naranja_claro}}
+\newcommand\mi{\cellcolor{naranja_osc}}
+
+{\renewcommand\arraystretch{1.5}
+\begin{tabular}
+{R{1cm}|
+M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|C}
+$n$ &\gr 0 &\gr 1 &\gr 2 &\gr 3 &\gr 4 &\gr 5 &\gr 6 &\gr 7&\gr 8&\gr 9&\gr 10&\gr\cdots\\ \hline \rowcolor{morado!20}
+$p(n)$ & 1 & 1 & 2 & 3 & 5 & \ma 7 & 11 & 15 & 22 & 30 & 42 &\cdots\\
+\end{tabular}
+
+\href{http://oeis.org/A000041}
+{\texttt{http://oeis.org/A000041}}
+
+\aparte{El valor $p(0) = 1$ proviene de la toma en
+consideración de la partición vacía (la que no tiene ningún
+sumando) para el número
+$0 = \sum(\vacio) = \sum_{i \in \vacio} i$.}
+
+\begin{resalte}
+¿Cómo calculamos $p(n)$ a partir de $n$?
+\end{resalte}
+La estrategia que proponemos comienza haciendo más difícil
+el problema, generalizándolo a la evaluación de la función
+$p_k(n)$, definida como el número de particiones de $n$ que
+tienen $k$ partes ($k$ sumandos) como mucho.
+
+\begin{center}
+\begin{minipage}{12cm}
+{\renewcommand\arraystretch{1.5}
+\begin{tabular}
+{c|%{M{.7cm}|
+M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|}
+\diagbox[height=1cm]{\gr $n$}{\gr $k$} &
+\gr 0 &\gr 1 &\gr 2 &\gr 3 &\gr 4 &\gr 5 &\gr 6 &\gr 7&\gr 8\\ \hline
+\gr $0$ & \mo 1 & \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1\\ \hline
+\gr $1$ &  & \mo 1 & \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1\\ \hline
+\gr $2$ &  & \mo 1 & \mo 2 & \mo 2& \mo 2& \mo 2& \mo 2& \mo 2& \mo 2\\ \hline
+\gr $3$ &  & \mo 1 & \mo 2 & \mo 3 & \mo 3& \mo 3& \mo 3& \mo 3& \mo 3\\ \hline
+\gr $4$ &  & \mo 1 & \mo 3 & \mo 4 & \mo 5 & \mo 5& \mo 5& \mo 5& \mo 5\\ \hline
+\gr $5$ &  & \mo 1 & \ma 3 & \mo 5 & \mo 6 & \mo 7 & \mo 7& \mo 7& \mo 7\\ \hline
+\gr $6$ &  & \mo 1 & \mo 4 & \mo 7 & \mo 9 & \mo 10 & \mo 11 & \mo 11& \mo 11\\ \hline
+\gr $7$ &  & \mo 1 & \mo 4 & \mo 8 & \mo 11 & \mo 13 & \mo 14 & \mo 15 & \mo 15\\ \hline
+\gr $8$ &  & \mo 1 & \mo 5 & \mo 10 & \mo 15 & \mo 18 & \mo 20 & \mo 21 & \mo 22\\ \hline
+\end{tabular}}\vspace{2mm}
+
+\emph{Cf.} \href{http://oeis.org/A026820}
+{\texttt{http://oeis.org/A026820}}
+\end{minipage}
+\end{center}
+
+Por ejemplo, de los dibujos anteriores, solo hay $3 =
+p_2(5)$ (los tres primeros) que quepan en dos filas.
+
+Esta tabla, destacada en un libro del siglo XVIII, se conoce
+como \emph{tabla de Euler}.\footnote{\textsc{L. Euler}:
+  \href{http://eulerarchive.maa.org/pages/E101.html}
+       {\emph{Introductio in Analysin Infinitorum I}}
+       (1748), pp. 327-328.} La función $p_k(n)$ toma un
+valor positivo (es decir: hay alguna partición de $n$ con
+$k$ partes o menos) cuando $n \geq 0$ y $k > 0$, además de
+en el caso $n = k = 0$. En cualquier otra situación,
+definimos $p_k(n) = 0$.
+
+\prop%
+{Contando con la capacidad para calcular $p_k(n)$ para
+  parámetros cualesquiera, ¿de qué manera se puede obtener
+  la cantidad de particiones de un número?}
+
+La complicación del problema tiene como ventaja la
+posibilidad de recurrir a la siguiente propiedad:
+
+\begin{center}
+{\renewcommand\arraystretch{1.5}
+\begin{tabular}
+{c|%{M{.7cm}|
+M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|M{.7cm}|}
+\diagbox[height=1cm]{\gr $n$}{\gr $k$} &
+\gr 0 &\gr 1 &\gr 2 &\gr 3 &\gr 4 &\gr 5 &\gr 6 &\gr 7&\tikzmark{a2}\gr 8\\ \hline
+\gr $0$ & \mo 1 & \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1\\ \hline
+\gr $1$ &  & \mo 1 & \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1& \mo 1\\ \hline
+\gr $2$ &  & \mo 1 & \mo 2 & \mo 2& \mo 2& \mo 2& \mo 2& \me 2\tikzmark{b2}& \mi\tikzmark{c2} 2\\ \hline
+\gr $3$ &  & \mo 1 & \mo 2 & \mo 3 & \me\tikzmark{a1} 3& \mo 3& \mo 3& \mo 3& \mo 3\\ \hline
+\gr $4$ &  & \mo 1 & \mo 3 & \mo 4 & \mo 5 & \mo 5& \mo 5& \mo 5& \mo 5\\ \hline
+\gr $5$ &  & \mo 1 & \mo 3 & \mo 5 & \mo 6 & \mo 7 & \mo 7& \mo 7& \mo 7\\ \hline
+\gr $6$ &  & \mo 1 & \mo 4 & \mo 7 & \mo 9 & \mo 10 & \mo 11 & \mo 11& \mo 11\\ \hline
+\gr $7$ &  & \mo 1 & \mo 4 & \me 8\tikzmark{b1} & \mi\tikzmark{c1} 11 & \mo 13 & \mo 14 & \mo 15 & \mo 15\\ \hline
+\gr $8$ &  & \mo 1 & \mo 5 & \mo 10 & \mo 15 & \mo 18 & \mo 20 & \mo 21 & \mo 22\\ \hline
+\end{tabular}
+\tikz[>=stealth, remember picture, overlay, baseline=0 pt]{
+\draw[thick, ->, shorten <=3pt, shorten >=6pt]
+(pic cs:a1) to[bend right=14pt] (pic cs:c1);
+\draw[thick, ->, shorten <=3pt, shorten >=3pt]
+(pic cs:b1) to (pic cs:c1);
+\draw[thick, ->, shorten <=-1cm, shorten >=8pt]
+(pic cs:a2) +(-2mm,0) to[bend right=5pt] (pic cs:c2);
+\draw[thick, ->, shorten <=3pt, shorten >=6pt]
+(pic cs:b2) to (pic cs:c2);
+}}
+\end{center}
+
+\begin{resalte}
+\centerline{$p_k(n) = p_{k - 1}(n) + p_k(n - k)$.}
+\end{resalte}
+
+\prop%
+{Explica con tus palabras porque se cumple esta igualdad.}
+
+Esto conduce a un algoritmo recursivo para la enumeración de
+las particiones:
+
+\def\pisto{cod_03_02.py}
+\def\pista{cod\_03\_02.py}
+\begin{minipage}[t]{7cm}
+\VerbatimInput%
+[frame=lines,framesep=2mm,label=\pista]%
+{\cod/\pisto}
+\end{minipage}}
+\hfill
+\begin{minipage}[t]{7cm}
+\prop%
+{Prueba este algoritmo con distintos valores del parámetro
+  para hacerte una idea de su alcance.}
+\vspace{5mm}
+
+\prop%
+{Compáralo con el algoritmo que usa Sage:}
+
+\begin{Verbatim}[commandchars=\\\{\}]
+\sh \inp{sage \ret}
+
+\sg \inp{Partitions(5).cardinality() \ret}
+\bl{7}
+\sg \inp{Partitions(1000).cardinality() \ret}
+\bl{24061467864032622473692149727991}
+\sg \inp{Partitions(10 ** 7).cardinality() \ret}
+\bl{920271755026...}
+\end{Verbatim}
+
+Hay margen entonces para mejorar la solución de la
+izquierda.
+\end{minipage}
+
+\begin{minipage}[t]{6cm}
+Podríamos afinar las reglas de determinación de la función
+$p_k(n)$ para ahorrar algunos pasos de la recursión, pero
+esto tampoco nos conduce demasiado lejos.
+\vspace{1cm}
+
+Date cuenta de que
+
+\[\forall k\geq n\ :\ p_k(n) = p_n(n).\]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{8cm}
+\VerbatimInput%
+[frame=lines,framesep=2mm]%
+{\cod/cod_03_02_v3_add.py}
+\end{minipage}
+\vspace{5mm}
+
+\prop%
+    {
+      Traduce los programas anterior a Scheme y da una cota sobre la complejidad espacial y temporal.
+    }
+    
+\prop%
+{Siguiendo la estrategia de «memoization», convierte
+  el algoritmo recursivo «ingenuo» en dos algoritmos
+  (\emph{iterativo/«bottom-up»} y \emph{«top-down»}) para el cálculo de
+  las particiones de un número y prográmalos en Scheme.}
+
+\prop%
+{Responde a las siguientes preguntas en términos de la complejidad especial y temporal para los nuevos algoritmos.\\[-3mm]
+
+Hasta alcanzar $p(n)$ con la estrategia \emph{bottom-up},
+¿cuántos términos de la tabla de Euler se calculan?  Para
+cada uno de estos cálculos, ¿a cuántas valores previamente
+almacenados se recurre? ¿Cuántas operaciones aritméticas se
+emplean en la obtención de $p(n)$?}
+
+
+Observa que no nos preguntamos por la cantidad de
+«operaciones máquina». Para completar el estudio de la
+complejidad del algoritmo, sería necesario acotar la talla
+de los resultados intermedios. Del resultado indicado al pie
+se deduce que esta talla se mantiene acotada por un polinomio.
+
+\prop%
+{¿Permite algún ahorro en este caso la estrategia
+  \emph{top-down}?}
+
+
+
+
+\vfill
+
+Para comprender el algoritmo tan eficiente que usa
+Sage,\footnote{%
+\textsc{F. Johansson}:
+\href{http://dx.doi.org/10.1112/S1461157012001088}
+{«Efficient implementation of the Hardy-Ramanujan-Rademacher
+formula»},
+LMS J. Comput. Math. {\bf 15}, 2012.}
+hace falta sumergirse más en las matemáticas. En concreto, a
+partir de la identidad asintótica
+
+\begin{resalte}
+[title=Hardy y Ramanujan (1918)]
+\[p(n) \sim \frac 1 {4n\sqrt 3}
+  \exp(\pi\sqrt{\nicefrac{2n}3}),\]
+\end{resalte}
+
+H. Rademacher obtuvo en 1938 una serie que aproxima la
+función de particiones y dedujo una cota en $O(\sqrt n)$
+para la cantidad de términos que garantiza la obtención del
+valor exacto.
+
+%% \sum_{k=1}^N \left(\sqrt{\nicefrac 3 k}\frac 4{24 n - 1}\right)
+%% \sum_{h=0}^{k - 1} \delta_{\gcd(h,k), 1}
+%% \exp\left(\pi i\left(s(h, k) - \frac{2hn} k\right)\right)
+%% \left(\cosh(\frac\pi{6k}\sqrt{24n - 1}) -
+%% \frac {6k}{\pi\sqrt{24n - 1}}
+%% \sinh(\frac\pi{6k}\sqrt{24n - 1})\right).\]
+\end{document}
