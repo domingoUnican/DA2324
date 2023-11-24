@@ -1,0 +1,187 @@
+\input{$HOME/Git_Repositories/encargos/ALGT/hojas/source/cabeza}
+\author{<replace: with your name>}
+\date{<replace: with today's date>}
+\title{<replace: with title>}
+\begin{document}
+
+\vspace{5mm}\centerline{\large\bf Pregunta 1}\vspace{5mm}
+\label{sec:org13e6c29}
+\centerline{\large\bf La facultad de Königsberg de arriba abajo}
+\vspace{5mm}
+
+En esta facultad hay muchas escaleras. Llamaremos
+\emph{tramo de escalera} al que lleva de un piso a otro. Sin
+aventurarnos en el sótano, nos proponemos  recorrer
+  todos esos tramos en un solo trayecto, sin repetir
+  ninguno (ni usar los ascensores u otro tipo de trampa).
+
+\begin{minipage}{.7\textwidth}
+Para representar la información de partida (cuántos tramos
+de escalera hay y cómo están dispuestos), utilizaremos un
+grafo (no dirigido). Comencemos dibujándolo. Sus vértices
+son las seis «plantas» de la facultad (contamos como dos
+tanto la segunda planta como la tercera; además, excluimos
+el sótano), según el esquema de la derecha. Esos nodos
+tienen enlaces que permiten acceder a los planos de la
+instalación.
+
+% lugar conexo dentro de un mismo nivel
+
+¡Atención! Es esta hoja trabajamos con grafos (no dirigidos
+  y) no necesariamente simples: pueden aparecer
+  múltiples aristas que unan la misma pareja de
+  vértices.
+\end{minipage}\hfill
+\begin{minipage}{.2\textwidth}
+% \includegraphics[width=.8\linewidth]{\figs/fig_05_01}
+\scaleto{$\input{fig_05_01b}$}{4cm}
+\end{minipage}\hfill
+
+\prop
+{¿Es posible realizar un recorrido como el propuesto? (0.5 puntos)}
+
+\prop
+{¿Es posible recorrer sin repetir ninguno todos los tramos
+  de escalera, comenzando y terminando además en el mismo
+  lugar? (0.5 puntos)}
+
+\prop
+{Responde también estas dos preguntas sobre el grafo
+resultante de eliminar la planta baja. (0.5 puntos)}
+
+Antes de continuar necesitamos definir un algoritmo para saber si un grafo no dirigido es conexo, es decir que siempre existe un camino entre dos nodos del grafo. Este problema se llama en general «dynamic connectivity» (conexión dinámica). Supongamos que tenemos un grafo con $n$ nodos y los etiquetamos con números ${1, \ldots, n}$.
+La idea para saber si dos nodos están unidos es utilizar un representante de los nodos que están unidos entre si.
+Esto se representa como una lista que será iniciada a ${1,2,\ldots, n}$, ya que cada nodo está conectado solo consigo mismo. Ahora, si tenemos $(p,q)\in E$ es una arista, entonces miramos que nodo representa la componente donde está $p$ y cambiamos en la lista este número por el número que representa la componente de $q$.
+un pseudo-codigo podría ser asi:
+\begin{verbatim}
+def unir(p,q):
+    pid = lista[p]
+    qip = lista[q]
+    para cada 0<= i < n:
+     si (lista[i] == qid):
+        lista[i] = pid
+\end{verbatim}
+
+
+\prop{Diseñe una estructura de datos, utilizando Scheme que represente este tipo de grafos. Esta estructura de datos tiene que ser programada con estilo «Message Passing» y tiene que permitir calcular adyacentes a un nodo, número de adyacentes a un nodo, quitar una arista y si un grafo es conexo. (3.5 puntos) }
+
+
+Un camino en un grafo que recorre, sin repeticiones, todas
+sus aristas, se llama \emph{camino euleriano}. Si, además,
+es circular, se denomina \emph{ciclo}
+(o \emph{circuito}) \emph{euleriano}. Un grafo es
+\emph{euleriano} cuando permite responder afirmativamente a la
+pregunta {\color{naranja_muy}\small\bf(2)}, es decir, cuando
+contiene un ciclo euleriano. Estas denominaciones se deben a
+que Euler dio, en un famosísimo estudio inspirado por los
+puentes regiomontanos, una caracterización sencilla que
+permite responder las dos preguntas, para cualquier grafo
+conexo, en función de la paridad de los grados de sus
+vértices:%
+\footnote{{\sc L. Euler}:
+\href{http://eulerarchive.maa.org/pages/E053.html}
+{«Solutio problematis ad geometriam situs pertinentis»},
+§20 (1741).}
+%\hfill
+%\href{http://eulerarchive.maa.org/pages/E053.html}
+%{\texttt{http://eulerarchive.maa.org/pages/E053.html}}
+
+\aparte{\emph{Caſu ergo quocunque propoſito ſtatim facillime
+    poterit cognoſci, vtrum tranſitus per omnes pontes ſemel
+    inſtitui queat an non, ope huius regulae. Si fuerint
+    plures duabus regiones, ad quas ducentium pontium
+    numerus eſt impar, tum certo affirmari poteſt, talem
+    tranſitum non dari. Si autem ad duas tantum regiones
+    ducentium pontium numerus eſt impar, tunc tranſitus
+    fieri poterit, ſi modo curſus in altera harum regionum
+    incipiatur. Si denique nulla omnino fuerti regio, ad
+    quam pontes numero impares conducant, tum tranſitus
+    deſiderato modo inſtitui poterit, in quacunque regione
+    ambulandi initium ponatur. Hac igitur data regula
+    problemati propoſito pleniſſime ſatisfit.}}
+
+\prop
+{Deduce (o traduce) una caracterización de los grafos que
+  contienen un camino euleriano y una de los grafos
+  eulerianos. (0.5 puntos)}
+
+\prop
+{Escribe una función que devuelva \texttt{True}
+  o \texttt{False} según el grafo de entrada (que podría ser
+  disconexo) sea o no euleriano. (1 punto)}
+
+\prop
+{Con las mismas condiciones, escribe una función que devuelva
+\begin{itemize}
+\item \texttt{False}, si el grafo de entrada no tiene ningún camino euleriano;
+\item \texttt{True}, si es euleriano;
+\item una lista de los dos vértices que son los extremos de cualquier camino euleriano en el grafo, en otro caso.
+\end{itemize} (1 punto)}
+
+
+
+Es sencillo demostrar la necesidad de la condición que
+venimos estudiando para la existencia de un ciclo o camino
+euleriano. Para la suficiencia, es conveniente (y apropiado
+para una asignatura sobre algoritmos) una demostración
+constructiva. Como dice la memoria de Euler, \emph{quaeſtio
+ſupereſt quomodo curſus ſit dirigendus.} Acto seguido, se
+propone describir el proceso de construcción: \emph{Pro hoc
+ſequenti vtor regula}. Sin embargo, despacha la cuestión con
+unas indicaciones demasiado escuetas,%
+\footnote{%
+\href{http://eulerarchive.maa.org/pages/E053.html}
+{«Solutio problematis ad geometriam situs pertinentis»}, §21.}
+que podríamos parafrasear así:
+\vspace{-4mm}
+
+%% \begin{itemize}
+%% \item Suprimir provisionalmente todas las parejas de caminos
+%% que tengan los mismos extremos.
+%% \item Por los caminos que quedan se encuentra con facilidad un
+%% camino del tipo que nos interesa.
+%% \item No difiere mucho de la solución que buscamos.
+%% \end{itemize}
+
+\aparte%
+{Suprimiendo provisionalmente todas las parejas de caminos
+que tengan los mismos extremos, por los caminos que queden
+se encuentra con facilidad un camino del tipo que nos
+interesa. No difiere mucho de la solución que buscamos.}
+
+A Euler no le pareció necesaria la descripción rigurosa de
+un algoritmo para esta tarea: \emph{neque opus eſſe iudico
+plura ad curſus reipſa formados praecipere.}
+Siglo y medio
+más tarde, el interés por la cuestión algorítmica se
+mostraba más vivo: según Fleury, la descripción de Euler es,
+por una parte, equívoca e incompleta y, por otra, la mejor
+para asegurarse de no resolver el problema.%
+\footnote{{\sc Fleury}:
+\href{https://archive.org/details/s2journaldemathm02pari/page/n265}
+{«Deux problèmes de géométrie de situation»}.
+Journal de Mathématiques Élémentaires, 1883, p. 261:\\
+\emph{%
+La règle donnée par Euler, équivoque et imcomplète, d’une
+part, est, d’autre part, la meilleure pour assurer la
+non-réussite du problème}.}
+
+\prop%
+{Programe en lenguaje Scheme un algoritmo que, tomando como entrada un grafo,
+construya un camino euleriano, si lo hay. (1.5 puntos)}
+
+\prop%
+{Analiza la complejidad espacial y temporal de la  implementación. Justifique si genera un proceso recursivo o iterativo. (1 punto)}
+
+
+
+\begin{resalte}
+La búsqueda de un camino euleriano está en {\bf P}, mientras
+que la de uno \emph{hamiltoniano} (una única visita a cada
+vértice, en vez de a cada arista) es un problema {\bf
+NP}-completo.
+\end{resalte}
+
+
+
+\end{document}
