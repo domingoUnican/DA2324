@@ -52,7 +52,9 @@
 
 
 (define (anade-ambiente nombre valor ambiente)
-  (hash-set! ambiente nombre valor))
+  (hash-set! ambiente nombre valor)
+  ;(displayln ambiente)
+  ambiente)
 
 (define (saca-ambiente nombre ambiente)
   (hash-ref ambiente nombre))
@@ -154,13 +156,15 @@
   (caddr p))
 
 (define (procedure-environment p)
-  (display p)
+  ;(displayln p)
   (cadddr p))
 
 (define (seval-procedure-application exp environ)
   (let ((proc (seval (car exp) environ))
         (args (seval-list (cdr exp) environ)))
-    (apply proc args)))
+    (if (list? proc)
+    (apply-procedure proc args)
+    (apply proc args))))
 
 (define (apply-procedure proc args)
   (let ((env (procedure-environment proc))
@@ -183,7 +187,7 @@
 
 (define (extend-environment vars vals base-env)
   (if (null? vars)
-      base-env
+      base-env  
       (anade-ambiente (car vars) (car vals)
                       (extend-environment (cdr vars) (cdr vals) base-env))))
 
@@ -203,14 +207,14 @@
 
 
 (define (begin-expressions exp)
-  (cdr exp)      ; Note: this returns a *list* of the expressions
+  (cdr exp)      
   )
 
-
+(anade-ambiente 'foo 123 ambiente) ; Se le anade a la variable 'foo el valor 123
 
 ;; Varias pruebas para ver que es lo que tiene que ocurrir
 (check-equal? (seval '42 ambiente) 42 "Primitives failed")
-;(check-equal? (seval 'foo ambiente) 123 "Symbol lookup failed")
+(check-equal? (seval 'foo ambiente) 123 "Symbol lookup failed")
 (seval '(define x 42) ambiente)
 (check-equal? (seval 'x ambiente) 42 "Simple define failed")
 
@@ -221,13 +225,14 @@
 
 (check-equal? (seval '(if (< 2 3) 1 (/ 1 0)) ambiente) 1 "if-true failed")
 (check-equal? (seval '(if (< 3 2) (/ 1 0) 1) ambiente) 1 "if-false failed")
-(display ambiente)
+;(display ambiente)
 
 ; Procedures
-;(seval '(define square (lambda (x) (* x x))) ambiente)
-;(check-equal? (seval '(square 4) ambiente) 16 "square failed")
+(seval '(define square (lambda (x) (* x x))) ambiente)
+;(display ambiente)
+(check-equal? (seval '(square 4) ambiente) 16 "square failed")
 
-;(seval '(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) ambiente)
-;(check-equal? (seval '(fact 5) ambiente) 120 "fact failed")
+(seval '(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) ambiente)
+(check-equal? (seval '(fact 5) ambiente) 120 "fact failed")
 
 
