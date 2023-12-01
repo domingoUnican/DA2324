@@ -6,26 +6,27 @@
 (define (seval exp environ)
   ; Evaluate a scheme expression
   (cond ((primitiva? exp) exp)                            ; Primitive just "are". Return back
-        ((symbol? exp) (recoge exp environ))  ; Symbols? Look up in the environment.
+        ((symbol? exp) (lookup exp environ))  ; Symbols? Look up in the environment.
         ((define? exp) (seval-define exp environ))
         ((if? exp) (seval-if exp environ))
-        ((quote? exp) (seval-quote exp environ))
+        ((quote? exp) exp)
         ; ((cond? exp) ...)
         ; ((let ...))
         ; ((delay...))
         ((begin? exp) (begin-expressions exp))
-        ((lambda? exp) ???)
-        ((aplicacion-procedimiento? exp) (haz-procedimiento exp env))
+        ((aplicacion-procedimiento? exp) (haz-procedimiento exp environ))
         (else (error "Error desconocido"))
         )
   )
 
 (define (nuevo-ambiente) (make-hash))
 (define (define-in-environment! nombre valor ambiente) (hash-set! ambiente nombre valor))
-(define (lookup ambiente llave)
+(define (lookup llave ambiente)
   (if (hash-has-key? ambiente llave)
       (hash-ref ambiente llave)
-      (lookup (hash-ref ambiente 'anterior) llave)))
+      (if (hash-has-key? ambiente 'anterior)
+          (lookup (hash-ref ambiente 'anterior) llave)
+          0)))
 (define ambiente (nuevo-ambiente))
 
 (define (primitiva? exp)
@@ -35,10 +36,15 @@
   (list? exp)
   )
 (define (haz-procedimiento exp env)
-  (apply (seval (car exp) env) (map (lambda (x) (seval x env)) (cdr exp))))
+  (if (and (pair? (car exp)) (equal? (car (car exp)) 'lambda))
+      (aplica-lambda (lambda-cuerpo exp) (lambda-args exp) env)
+      (begin
+        (displayln exp)
+        (apply (seval (car exp) env) (map (lambda (x) (seval x env)) (cdr exp))))))
 
 ; (define name value)
-
+(define (genera-funcion exp environ)
+  ()
 ; Predicate to test
 (define (define? exp)
   (and (list? exp) (eq? (car exp) 'define))
@@ -72,7 +78,7 @@
 ; Como evaluar el operador quote
 
 (define (seval-quote exp environ)
-  (apply (seval (car exp) env) (map (lambda (x) (seval x env)) (cdr exp))))
+  (apply (seval (car exp) environ) (map (lambda (x) (seval x environ)) (cdr exp))))
 
 ; (if test consequence alternative)
 
@@ -113,7 +119,9 @@
 
 ; lambda
 (define (lambda? exp)
-  (and (list? exp) (eq? (car (car exp)) 'lambda))
+  (if (and (list? exp)(not (null? (cdr exp))))
+      (eq? (car (car exp)) 'lambda)
+      (eq? (car exp) 'lambda))
   )
 
 (define (crear_nuevo_ambiente_funcion nombre_args val_args actual)
@@ -127,10 +135,38 @@
           (hash-set! nuevo_ambiente (car nombre_args) (car val_args))
           nuevo_ambiente
           ))))
-(define (guardar-lambda exp environ)) ; aqui hacer define de una funcion con el cuerpo de la exp y crear el ambiente para ella
+
+(define (lambda-args exp)
+  (cadr (car exp)))
+(define (lambda-cuerpo exp)
+  (cadr (cdr (car exp))))
+(define (lambda-valores exp)
+  (cadr exp))
+(define (aplica-lambda funcion argumentos ambiente)
+  (let ((variables (car (cdr funcion))) ;(x y z)
+        (ambiente-nuevo (nuevo-ambiente)) ;nuevo ambiente
+        (cuerpo (car (cdr (cdr funcion)))); (* x y z)
+        )
+    (anade-ambiente ambiente-nuevo variables argumentos)
+    (seval cuerpo ambiente-nuevo)))
+
+(define (anade-ambiente ambiente variables argumentos)
+  (if (null? variables)
+      ambiente
+      (begin
+        (hash-set! ambiente (car variables) (car argumentos))
+        (anade-ambiente ambiente (cdr variables) (cdr argumentos))
+        ))) 
 
 
+(define (check-equal? elem1 elem2 error)
+  (if (not (equal? elem1 elem2))
+      (displayln error)
+      true))
 
+
+(define environ (nuevo-ambiente))
+(anade-ambiente environ '(+ - * < > /) (list + - *))
 ;; Varias pruebas para ver que es lo que tiene que ocurrir
 (check-equal? (seval '42 environ) 42 "Primitives failed")
 (check-equal? (seval 'foo environ) 123 "Symbol lookup failed")
@@ -149,6 +185,4 @@
 
 (seval '(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) environ)
 (check-equal? (seval '(fact 5) environ) 120 "fact failed")
-
-
 
