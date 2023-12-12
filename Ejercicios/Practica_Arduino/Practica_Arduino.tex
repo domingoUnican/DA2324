@@ -1,0 +1,301 @@
+% Created 2022-12-08 jue 17:42
+% Intended LaTeX compiler: pdflatex
+\documentclass{article}
+\pagestyle{empty}
+
+\usepackage{amsmath}
+\usepackage{mathspec}
+\usepackage{nicefrac}
+\usepackage{listings}
+%fontspec
+\setmainfont%[SmallCapsFont={Linux Biolinum Capitals O}]%
+{TeX Gyre Pagella}
+\def\paragriego{Anaktoria}
+% \def\paragriego{GFS Complutum}
+\setmonofont{Terminus (TTF)}
+%           [BoldFont={TerminusTTF-Bold}]
+%\setmathsfont(Digits,Latin,Greek){Euler}
+\usepackage[a4paper, text={15.5cm, 25cm}]{geometry}
+\addtolength\parskip{3mm}
+
+\usepackage{amssymb}
+\usepackage{pagecolor}
+\usepackage{pbox}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage[lined,spanish]{algorithm2e}
+%\usepackage{minted}
+\setlength\parindent{0pt}
+
+\usepackage[hang,flushmargin]{footmisc}
+
+\newcommand\id{\mbox{indeg}}
+\newcommand\od{\mbox{outdeg}}
+
+\newcommand\N{\mathbb{N}}
+\newcommand\Z{\mathbb{Z}}
+\newcommand\Q{\mathbb{Q}}
+
+\newcommand\ret{↵\ } % ⏎, 〈RET〉
+
+\newcommand\tr{^{\mbox{\footnotesize t}}}   % transpuesta
+
+\definecolor{morado}{RGB}{85, 39, 107}
+\definecolor{naranja_muy}{RGB}{255, 156, 59} % (1, .612, .231)
+\definecolor{naranja_osc}{RGB}{255, 191, 128} % (1, .749, .501)
+\definecolor{naranja_claro}{RGB}{255, 229, 204} % (1, .898, .8)
+\definecolor{marca}{RGB}{242, 140, 113}
+
+\newcommand\inp[1]{\colorbox{gray!40}{#1}} % ¿Sobra espacio a la izquierda?
+\newcommand\mrc{\color{marca!90!black}}
+
+\usepackage{stmaryrd}       % flecha
+
+%% \usepackage{marginnote}
+%% \reversemarginpar
+
+\newcounter{pregunta}
+\newcommand\prop[1]%
+{\addtocounter{pregunta}{1}
+\noindent%\marginnote
+{\color{naranja_muy}\small\bf\thepregunta)}
+%{$\rightarrowtriangle$}\ %
+\parbox[t]{.95\linewidth}{\it #1}}
+
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}
+
+\usepackage{array}
+% alineada a la derecha, anchura fija
+\newcolumntype{R}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{C}{>{$}c<{$}}
+\newcolumntype{M}[1]
+{>{\centering\arraybackslash $}m{#1}<{$}}
+
+% Para las flechas en tablas...
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{arrows}
+
+\newcommand\aparte[1]{%
+\hfill%{\color{black!60}\vline}\quad
+\begin{minipage}[t]{.9\linewidth}%
+\color{black!80!blue}\small #1
+\end{minipage}}
+
+\def\adentro#1{\hspace{.05\linewidth}
+  \parbox{.8\linewidth}{\small #1}}
+
+\XeTeXdashbreakstate = 0
+
+\usepackage{xstring}
+\usepackage{ifthen}
+\usepackage{xifthen}
+
+\usepackage{tcolorbox}
+\newtcolorbox{resalte}[1][]%
+{coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=3mm, bottom=3mm, left=3mm, right=3mm,
+colframe=naranja_osc, boxrule=1pt,
+left skip=0pt, right skip=4cm, #1}
+%segmentation style={solid}}
+%segmentation engine=empty}
+%segmentation style={double=white}}
+
+\newtcolorbox{resalte_chico}[1][]%
+{arc=3pt, colback=naranja_claro,
+top=1mm, bottom=1mm, left=1mm, right=3mm,
+colframe=naranja_osc, boxrule=1pt,
+left skip=0pt, right skip=4cm, #1}
+
+\newtcbox{resaltelinea}[1][]%
+{tcbox raise base, nobeforeafter,
+coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=1mm, bottom=1mm, left=1mm, right=0pt,
+colframe=naranja_osc, boxrule=1pt,
+#1}
+
+\newtcbox{resalteajustado}[1][]%
+{tcbox raise base, nobeforeafter,
+coltitle=black,
+arc=3pt, colback=naranja_claro,
+top=0mm, bottom=0mm, left=0pt, right=0pt,
+colframe=naranja_osc, boxrule=1pt,
+#1}
+
+\newcommand\respuestas{{\color{naranja_muy}\bf Respuestas}
+\vspace{5mm}}
+
+\newcommand\figs{../figs}
+\newcommand\cod{../scripts}
+\newcommand\grf{../grafos}
+
+\newcommand\espacio{␣}
+\newcommand\vacio{\mbox{\fontspec{FreeSerif}∅}}
+
+\pagecolor{morado!10} % 238, 233, 240 (.933, .914, .941)
+
+\def\truca
+{~\par}
+\def\trucavuelve
+{~\par\vspace{-\baselineskip}}
+
+\usepackage[spanish]{babel}
+\usepackage{colortbl}
+
+\newcommand\gr{\color{gray}}
+
+\usepackage{diagbox}
+\usepackage{scalerel}
+\usepackage{multirow}
+
+\usepackage{eso-pic}
+
+\def\msi{\color{naranja_muy}{\fontspec{FreeSerif}✓}}
+\def\mno{{\fontspec{FreeSerif}✗}}
+
+\def\pyt{{\color{naranja_muy}\texttt{>>>}}}
+\def\pyc{{\color{naranja_muy}\texttt{...}}}
+\def\sh{{\color{naranja_muy}\texttt{\$}}\hspace{-1em} }
+\def\shc{{\color{naranja_muy}\texttt{>}}}
+\def\sg{{\color{naranja_muy}\texttt{sage:}}}
+\def\sgc{{\color{naranja_muy}\texttt{....:}}}
+\def\bl#1{{\color{black!50!blue}\texttt{#1}}}
+\def\ro#1{{\color{red!80!black}\texttt{#1}}}
+
+\begin{document}
+\shorthandoff{>}\shorthandoff{<}
+
+\vspace{5mm}\centerline{\large\bf Práctica de uso de Arduino}\vspace{5mm}
+\label{sec:orgbb05154}
+
+El objetivo de esta práctica es recordar todos los conceptos vistos durante el curso y aplicarlo a un caso práctico donde la implementación es compleja.
+
+\textbf{Antes de empezar y aunque sea una práctica en grupo, se pide a todos los integrantes rellenar el siguiente} \href{https://forms.gle/pS8vjtNx2hcGZ7MD9}{formulario}.
+
+La tarea está dirigida a iniciar al
+estudiante en el microcontrolador Arduino y consistirá
+en que se programe un coche robot para que siga la línea en un circuito (Simulador Oviedo).
+
+\section*{El simulador Oviedo}
+Un arduino es un microcontrolador, es decir, un circuito integrado
+programable que incluye las tres partes funcionales de un ordenador:
+unidad central de procesamiento, memoria y dispositivos de entrada y
+salida. Los dispositivos de entrada y salida se les suele denominar \textbf{Pin}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.9\linewidth]{./tabla.png}
+\caption{Principales modelos de arduino con sus características: tomada de hetpro-store.com}
+\end{figure}
+
+Los pines de un microcontrolador Arduino son de dos
+tipos: 
+\begin{itemize}
+\item Dígitales: La lectura o escritura  una variación  de  voltaje  entre
+dos valores  sin  tener en cuenta los intermedios. Por lo
+tanto, una señal digital dispone solo de dos estados. Al valor
+inferior  de  tensión -Vcc le asociamos un valor lógico LOW o ‘0’,
+mientras que al valor superior +Vcc le asociamos HIGH o ‘1’ lógico.
+\item Analógicos: En este caso, se puede tomar cualquier magnitud entre
+los valores -Vcc y +Vcc.
+\end{itemize}
+
+
+
+En esta práctica, tenemos un microcontrolador Arduino que, entre otros
+elementos electrónicos, consta de: 
+\begin{itemize}
+\item Motores, que son los que se encargan de mover las ruedas
+\item Sensores, que se encargan de detectar el color negro en el suelo.
+\end{itemize}
+
+Durante la práctica, utilizaremos los dos tipos de pines. Los
+analógicos serán utilizados para mover los motores y los
+digitales se utilizarán para las lecturas de los sensores.
+
+Empecemos por los motores, la velocidad de estos es un valor entre $0$
+y 180, siendo 
+\begin{itemize}
+\item $90$ la posición de estar parado
+\item $180$ es velocidad máxima hacia delante en el motor derecho y hacia
+atrás en el izquierdo
+\item $0$ es velocidad máxima hacia delante en el motor  izquierdo y hacia
+atrás en el derecho
+\end{itemize}
+
+En el siguiente cuadro de código está comentado el uso y
+funcionamiento de los motores.
+
+
+\begin{lstlisting}[frame=lines,fontsize=\scriptsize,linenos]{c}
+#include <Servo.h>
+Servo servoIzq; // Rueda izquierda
+Servo servoDer; // Rueda derecha
+
+int pinServoDer = 9;
+int pinServoIzq = 8;
+void setup(){
+ 
+  servoIzq.attach(pinServoIzq); // Escribir y leer la velocidad del motor izq
+  servoDer.attach(pinServoDer); // Escribir y leer la velocidad del motor dcha
+  
+}
+
+void stopMotor(){
+  servoIzq.write(90); 
+  servoDer.write(90);
+}
+
+void forwardMotor(){
+  servoIzq.write(0); 
+  servoDer.write(180);
+}
+\end{lstlisting}
+
+
+\prop{Explique con palabras como se hace girar el coche a la izquierda y a la derecha, según el código del fichero \emph{siguelineas.ino}. Diga como se hace para leer los pines de digitales de los sensores, explicando que valores son los que se utilizan para detectar linea en el suelo}
+\label{sec:orgf83509a}
+
+Para la programación de un dispositivo Arduino, se utiliza el lenguaje
+de programación C, con algunas modificaciones y librerías que se
+explican por el funcionamiento del microcontrolador.
+
+La primera modificación es la presencia de dos métodos \textbf{setup} y
+\textbf{loop}, y la no presencia del método \textbf{main}. El funcionamiento de un
+Arduino es muy parecido al de un \emph{autómata finito} (que se vio en la
+asignatura de Lenguajes Formales) y por ello tiene una parte de
+configuración (\textbf{setup}) y la siguiente es la parte donde se repite un
+mismo procedimiento, a partir de las entradas (\textbf{loop}). Se podría
+pensar que este bucle se repite de forma infinita.
+
+
+Para la programación del coche Arduino se pide utilizar el simulador incluido.
+
+
+Las instrucciones de uso son las siguientes:
+\begin{itemize}
+\item Descomprime y ejecuta el simulador mediante main.exe
+\item Selecciona la opción “Robot Móvil (4 infrarrojos) y Circuito
+\item Selecciona \emph{Archivo->Importar sketch} para cargar el archivo \emph{siguelineas.ino}.
+\end{itemize}
+
+Se puede mover el coche Arduino con las teclas de movimiento “AWSD”. Para ejecutar
+el archivo, debes desmarcar la acción \emph{Movimiento con el teclado},
+pulsar \emph{stop} y \emph{play}  y se
+iniciará la ejecución.
+
+\prop{Quite el comentario y complete el código \emph{siguelineas.ino}, de forma que el coche Arduino siga todo el circuito de manera autónoma.}
+\label{sec:org15a69fa}
+
+Un problema del programa de \emph{siguelineas.ino} es que si no empieza en
+una linea, no hay forma \textbf{determinista} de encontrar el camino de
+vuelta a la linea, ya que no se conoce la posición.
+
+\prop{Programe el generador de números pseudoaleatorio «Linear Congruential Generator», busque su definición en Wikipedia y utilice la siguiente estrategia probabilista para encontrar la linea: generar un bit, si el bit es uno girar 90 grados a la derecha y avanzar 400 ms, si es cero girar 90 grados a la izquierda y avanzar. Seguir así hasta encontrar la linea.}
+\label{sec:orgbecb0ad}
+
+
+\end{document}
+
