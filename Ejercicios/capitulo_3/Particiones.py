@@ -57,6 +57,22 @@ def p_act3(n, k, tabla):
         return 0
 
 
+def p_bottom_up(n):
+    """Calcula el número de particiones de n utilizando un enfoque bottom-up"""
+    tabla = [[0] * (n + 1) for _ in range(n + 1)]
+
+    for i in range(n + 1):
+        tabla[i][0] = 1  # Caso base: una manera de sumar a 0
+
+    for i in range(1, n + 1): #i representa k 
+        for j in range(1, n + 1): #j representa n
+            if j >= i:
+                tabla[i][j] = tabla[i - 1][j] + tabla[i][j - i]
+            else:
+                tabla[i][j] = tabla[i - 1][j]
+
+    return tabla[n][n]
+
 "Algoritmo de sage, Ejercicio4"
 #Partitions(5).cardinality() 
 #SageMath utiliza estructuras de datos, y formulas avanzadas para calcular el número de particiones.
@@ -68,16 +84,19 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         n = int(sys.argv[1])
-        print('p(%d) = %d' % (n, p(n)))
-        print('p(%d) = %d' % (n,p2(n)))
-        print('p(%d) = %d' % (n,p3(n)))
+        #print('p(%d) = %d' % (n, p(n)))
+        #print('p(%d) = %d' % (n,p2(n)))
+        #print('p(%d) = %d' % (n,p3(n)))
+        print('p(%d) = %d' % (n,p_bottom_up(n)))
        
 
+        
+        #tiempo1 = timeit.timeit(lambda: p(n), number=1)
+        #tiempo2 = timeit.timeit(lambda: p2(n), number=1)
+        #tiempo3 = timeit.timeit(lambda: p3(n), number=1)
+        tiempo4 = timeit.timeit(lambda: p_bottom_up(n), number=1)
 
-        tiempo1 = timeit.timeit(lambda: p(n), number=1)
-        tiempo2 = timeit.timeit(lambda: p2(n), number=1)
-        tiempo3 = timeit.timeit(lambda: p3(n), number=1)
-
-        print(f'Tiempo de ejecución: {tiempo1:.6f} segundos')
-        print(f'Tiempo de ejecución: {tiempo2:.6f} segundos')
-        print(f'Tiempo de ejecución: {tiempo3:.6f} segundos')
+        #print(f'Tiempo de ejecución: {tiempo1:.6f} segundos')
+        #print(f'Tiempo de ejecución: {tiempo2:.6f} segundos')
+        #print(f'Tiempo de ejecución: {tiempo3:.6f} segundos')
+        print(f'Tiempo de ejecución: {tiempo4:.6f} segundos')

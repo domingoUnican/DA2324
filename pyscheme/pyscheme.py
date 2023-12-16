@@ -21,17 +21,12 @@ def pon_en_env(x, y):
     global env
     env[x] = seval(y)
 
-
-env = {'+': lambda x, y: x+y,
-       'define': pon_en_env,
-    }
-
-def hacer_funcion(argumentos, cuerpo):
+def hacer_funcion(argumentos, cuerpo): # Equivalente de hacer una funcion
     def funcion(*valores):
         for nombre, valor in zip(argumentos, valores):
             cuerpo = substitucion(cuerpo, nombre, valor)
         return cuerpo
-    return funcion
+    return funcion # se devuelve un objeto funcion
 
 def substitucion(exp, nombre, valor):
     if exp == nombre:
@@ -41,6 +36,14 @@ def substitucion(exp, nombre, valor):
     else:
         return exp
 
+env = {
+        '+': lambda *args: sum(args),
+        '-': lambda *args: args[0] - sum(args[1:]),
+        '*': lambda *args: args[0] * args[1],
+        '/': lambda *args: args[0] / args[1],
+        'define': pon_en_env,
+        'fact': fact
+}
 # You will define the following procedure for evaluating an expression
 def seval(sexp):
     if isinstance(sexp, int):
@@ -49,15 +52,27 @@ def seval(sexp):
         return env.get(sexp, sexp) 
     elif isinstance(sexp, tuple):
         if sexp[0] == 'if':
-            "completar"
-            return 
+            condition = seval(sexp[1])
+            if condition:
+                return seval(sexp[2])
+            else:
+                return seval(sexp[3])
         elif sexp[0] == 'lambda':
-            "completar"
-            return 
+            args = sexp[1]
+            body = sexp[2]
+            return hacer_funcion(args, body)
+        elif sexp[0] == 'define':
+            name = sexp[1]
+            value = seval(sexp[2])
+            pon_en_env(name, value)
+            return value
+        elif sexp[0] == 'fact':  # Llamada a factorial
+            return fact
         func = seval(sexp[0])
         args = [seval(e) for e in sexp[1:]]
         return func(*args)
-
+    
+    
 # In writing seval, you are ONLY allowed to use the rules of Scheme
 # evaluation that you currently know about.  So far, this includes the
 # substitution model and the notion of special forms.
@@ -70,5 +85,5 @@ seval(('define', 'n', 5))
 assert seval('n') == 5
 
 # Now the ultimate test--can you run your procedure?
-#seval(fact)
-#assert seval(('fact', 'n')) == 120
+seval(fact)
+assert seval(('fact', 'n')) == 120
