@@ -9,11 +9,12 @@
         ((symbol? exp) (lookup exp environ))  ; Symbols? Look up in the environment.
         ((define? exp) (seval-define exp environ))
         ((if? exp) (seval-if exp environ))
-        ((quote? exp) exp)
+        ((quote? exp) (cadr exp))
         ; ((cond? exp) ...)
         ; ((let ...))
         ; ((delay...))
-        ((begin? exp) (begin-expressions exp))
+        ((begin? exp) (hacer-begin (begin-expressions exp) environ))
+        ((lambda? exp) (genera-funcion exp environ))
         ((aplicacion-procedimiento? exp) (haz-procedimiento exp environ))
         (else (error "Error desconocido"))
         )
@@ -25,7 +26,7 @@
   (if (hash-has-key? ambiente llave)
       (hash-ref ambiente llave)
       (if (hash-has-key? ambiente 'anterior)
-          (lookup (hash-ref ambiente 'anterior) llave)
+          (lookup llave (hash-ref ambiente 'anterior))
           0)))
 (define ambiente (nuevo-ambiente))
 
@@ -36,15 +37,31 @@
   (list? exp)
   )
 (define (haz-procedimiento exp env)
-  (if (and (pair? (car exp)) (equal? (car (car exp)) 'lambda))
-      (aplica-lambda (lambda-cuerpo exp) (lambda-args exp) env)
-      (begin
-        (displayln exp)
-        (apply (seval (car exp) env) (map (lambda (x) (seval x env)) (cdr exp))))))
+  (apply (seval (car exp) env)
+    (map (lambda (x) (seval x env)) (cdr exp))))
 
-; (define name value)
 (define (genera-funcion exp environ)
-  ()
+  (lambda args
+    (seval (caddr exp) (crear_nuevo_ambiente_funcion (cadr exp) args environ))
+  )
+)
+
+
+
+(define (crear_nuevo_ambiente_funcion nombre_args val_args actual)
+  (if (null? nombre_args)
+      (begin
+        (let ((h (make-hash)))
+          (hash-set! h 'anterior actual)
+          h))
+      (let ((nuevo_ambiente (crear_nuevo_ambiente_funcion (cdr nombre_args) (cdr val_args) actual)))
+        (begin
+          (hash-set! nuevo_ambiente (car nombre_args) (car val_args))
+          nuevo_ambiente
+          ))))
+
+
+
 ; Predicate to test
 (define (define? exp)
   (and (list? exp) (eq? (car exp) 'define))
@@ -63,7 +80,7 @@
 (define (seval-define exp environ)
   (let ((name (define-name exp))
         (value (define-value exp)))
-    (define-in-environment! name (seval value environ) environ)
+    (hash-set! environ name (seval value environ))
     )
   )
 
@@ -117,24 +134,14 @@
   (cdr exp)      ; Note: this returns a *list* of the expressions
   )
 
+(define (hacer-begin exp environ)
+  (if (null? (cdr exp)) 
+    (seval (car exp) environ)
+    (begin (seval (car exp) environ) (hacer-begin (cdr exp) environ))))
+
 ; lambda
 (define (lambda? exp)
-  (if (and (list? exp)(not (null? (cdr exp))))
-      (eq? (car (car exp)) 'lambda)
-      (eq? (car exp) 'lambda))
-  )
-
-(define (crear_nuevo_ambiente_funcion nombre_args val_args actual)
-  (if (null? nombre_args)
-      (begin
-        (let ((h (make-hash)))
-          (hash-set! h 'anterior actual)
-          h))
-      (let ((nuevo_ambiente (crear_nuevo_ambiente_funcion (cdr nombre_args) (cdr val_args))))
-        (begin
-          (hash-set! nuevo_ambiente (car nombre_args) (car val_args))
-          nuevo_ambiente
-          ))))
+  (and (list? exp) (eq? (car exp) 'lambda)))
 
 (define (lambda-args exp)
   (cadr (car exp)))
@@ -166,7 +173,7 @@
 
 
 (define environ (nuevo-ambiente))
-(anade-ambiente environ '(+ - * < > /) (list + - *))
+(anade-ambiente environ '(+ - * < > / 'true 'false 'lambda =) (list + - * < > / true false "lambda" =))
 ;; Varias pruebas para ver que es lo que tiene que ocurrir
 (check-equal? (seval '42 environ) 42 "Primitives failed")
 (check-equal? (seval 'foo environ) 123 "Symbol lookup failed")
