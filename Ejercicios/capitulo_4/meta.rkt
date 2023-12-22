@@ -9,7 +9,7 @@
         ((symbol? exp) (lookup exp environ))  ; Symbols? Look up in the environment.
         ((define? exp) (seval-define exp environ))
         ((if? exp) (seval-if exp environ))
-        ((quote? exp) (cadr exp))
+        ((quote? exp) (quote-expression exp))
         ; ((cond? exp) ...)
         ; ((let ...))
         ; ((delay...))
@@ -21,45 +21,15 @@
   )
 
 (define (nuevo-ambiente) (make-hash))
-(define (define-in-environment! nombre valor ambiente) (hash-set! ambiente nombre valor))
 (define (lookup llave ambiente)
   (if (hash-has-key? ambiente llave)
       (hash-ref ambiente llave)
       (if (hash-has-key? ambiente 'anterior)
           (lookup llave (hash-ref ambiente 'anterior))
           0)))
-(define ambiente (nuevo-ambiente))
 
 (define (primitiva? exp)
   (or (number? exp) (boolean? exp)))
-
-(define (aplicacion-procedimiento? exp)
-  (list? exp)
-  )
-(define (haz-procedimiento exp env)
-  (apply (seval (car exp) env)
-    (map (lambda (x) (seval x env)) (cdr exp))))
-
-(define (genera-funcion exp environ)
-  (lambda args
-    (seval (caddr exp) (crear_nuevo_ambiente_funcion (cadr exp) args environ))
-  )
-)
-
-
-
-(define (crear_nuevo_ambiente_funcion nombre_args val_args actual)
-  (if (null? nombre_args)
-      (begin
-        (let ((h (make-hash)))
-          (hash-set! h 'anterior actual)
-          h))
-      (let ((nuevo_ambiente (crear_nuevo_ambiente_funcion (cdr nombre_args) (cdr val_args) actual)))
-        (begin
-          (hash-set! nuevo_ambiente (car nombre_args) (car val_args))
-          nuevo_ambiente
-          ))))
-
 
 
 ; Predicate to test
@@ -85,17 +55,14 @@
   )
 
 
-
+; quote
 (define (quote? exp)
   (and (list? exp) (eq? (car exp) 'quote)))
 
 (define (quote-expression exp)
-  (cadr exp))
-
-; Como evaluar el operador quote
-
-(define (seval-quote exp environ)
-  (apply (seval (car exp) environ) (map (lambda (x) (seval x environ)) (cdr exp))))
+  (if (null? (cdr (cdr exp)))
+      (cadr exp)
+      (cdr exp)))
 
 ; (if test consequence alternative)
 
@@ -139,23 +106,10 @@
     (seval (car exp) environ)
     (begin (seval (car exp) environ) (hacer-begin (cdr exp) environ))))
 
-; lambda
+; lambda y evaluar funciones
 (define (lambda? exp)
   (and (list? exp) (eq? (car exp) 'lambda)))
 
-(define (lambda-args exp)
-  (cadr (car exp)))
-(define (lambda-cuerpo exp)
-  (cadr (cdr (car exp))))
-(define (lambda-valores exp)
-  (cadr exp))
-(define (aplica-lambda funcion argumentos ambiente)
-  (let ((variables (car (cdr funcion))) ;(x y z)
-        (ambiente-nuevo (nuevo-ambiente)) ;nuevo ambiente
-        (cuerpo (car (cdr (cdr funcion)))); (* x y z)
-        )
-    (anade-ambiente ambiente-nuevo variables argumentos)
-    (seval cuerpo ambiente-nuevo)))
 
 (define (anade-ambiente ambiente variables argumentos)
   (if (null? variables)
@@ -163,7 +117,34 @@
       (begin
         (hash-set! ambiente (car variables) (car argumentos))
         (anade-ambiente ambiente (cdr variables) (cdr argumentos))
-        ))) 
+        )))
+
+(define (aplicacion-procedimiento? exp)
+  (list? exp)
+  )
+(define (haz-procedimiento exp env)
+  (apply (seval (car exp) env)
+    (map (lambda (x) (seval x env)) (cdr exp))))
+
+(define (genera-funcion exp environ)
+  (lambda args
+    (seval (caddr exp) (crear_nuevo_ambiente_funcion (cadr exp) args environ))
+  )
+)
+
+(define (crear_nuevo_ambiente_funcion nombre_args val_args actual)
+  (if (null? nombre_args)
+      (begin
+        (let ((h (make-hash)))
+          (hash-set! h 'anterior actual)
+          h))
+      (let ((nuevo_ambiente (crear_nuevo_ambiente_funcion (cdr nombre_args) (cdr val_args) actual)))
+        (begin
+          (hash-set! nuevo_ambiente (car nombre_args) (car val_args))
+          nuevo_ambiente
+          ))))
+
+
 
 
 (define (check-equal? elem1 elem2 error)
@@ -182,6 +163,7 @@
 (seval '(define y (+ 2 3)) environ)
 (check-equal? (seval 'y environ) 5 "Expression define failed")
 (check-equal? (seval '(quote x) environ) 'x "Quoting failed")
+(check-equal? (seval '(quote 1 2 3) environ) '(1 2 3) "Quoting failed")
 
 (check-equal? (seval '(if (< 2 3) 1 (/ 1 0)) environ) 1 "if-true failed")
 (check-equal? (seval '(if (< 3 2) (/ 1 0) 1) environ) 1 "if-false failed")
@@ -192,4 +174,5 @@
 
 (seval '(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) environ)
 (check-equal? (seval '(fact 5) environ) 120 "fact failed")
+
 
