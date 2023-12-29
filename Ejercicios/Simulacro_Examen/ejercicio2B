@@ -1,0 +1,13 @@
+#lang racket
+
+
+((lambda (n fib contador val1 val2)
+   (if (= contador n)
+       (+ val1 val2)
+       (fib n fib (+ contador 1) (+ val1 val2) val1)
+  )) 6 (lambda (n fib contador val1 val2)
+   (if (= contador n)
+       (+ val1 val2)
+       (fib n fib (+ contador 1) (+ val1 val2) val1)
+  )) 2 1 0)
+                                            
