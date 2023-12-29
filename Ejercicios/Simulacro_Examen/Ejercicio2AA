@@ -1,0 +1,10 @@
+#lang racket
+
+(define (suma-iguales x . z)
+  (define (fun lista)
+    (if (even? x)
+        (filter even? lista)
+        (filter odd? lista)))
+
+    (+ (apply + (fun z)) x)
+  )
