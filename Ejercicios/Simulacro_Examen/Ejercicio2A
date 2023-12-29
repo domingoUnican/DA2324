@@ -1,1 +1,24 @@
-#
+
+#lang racket
+
+(define (suma_pares lista)
+         (if (null? lista)
+             0
+             (+ (if (even? (car lista))
+                           (car lista)
+                           0) (suma_pares (cdr lista)))))
+
+ (define (suma_impares lista)
+         (if (null? lista)
+             0
+             (+ (if (odd? (car lista))
+                           (car lista)
+                           0) (suma_impares (cdr lista)))))
+(define (suma-iguales x . z)
+  (define (fun)
+    (if (even? x)
+        suma_pares
+        suma_impares))
+
+    (+ ((fun) z) x)
+  )
