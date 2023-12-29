@@ -1,0 +1,14 @@
+#lang racket
+
+(define (fib n temp)
+  (if (<= n 2)
+      1
+      (+ (fib (- n 1) temp) (fib (- n 2) temp))))
+((lambda (n fib)
+  (if (<= n 2)
+      1
+      (+ (fib (- n 1) fib) (fib (- n 2) fib)))) 
+                                                (lambda (n fib)
+  (if (<= n 2)
+      1
+      (+ (fib (- n 1) fib) (fib (- n 2) fib)))))
